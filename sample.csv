@@ -1,0 +1,5 @@
+patient_id,age,sex,creatinine,creatinine_unit,cystatin_c,acr
+P001,50,F,1.0,mg/dL,,
+P002,60,M,106.08,umol/L,1.0,400
+P003,72,F,2.4,mg/dL,1.9,850
+P004,35,M,0.9,mg/dL,,15

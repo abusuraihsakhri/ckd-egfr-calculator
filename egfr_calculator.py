@@ -513,8 +513,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
                         help="Race for 2009 CKD-EPI equation (default: other)")
 
     batch = subparsers.add_parser("batch", help="Calculate eGFR for a CSV of patients")
-    batch.add_argument("--input", required=True, help="Path to input CSV")
-    batch.add_argument("--output", required=True, help="Path to write output CSV")
+    batch.add_argument("-i", "--input", required=True, help="Path to input CSV")
+    batch.add_argument("-o", "--output", required=True, help="Path to write output CSV")
 
     return parser
 

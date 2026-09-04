@@ -1,115 +1,54 @@
-# CKD EGFR Calculator
+# CKD-EPI eGFR Calculator & KDIGO Staging Engine
 
-> **Domain:** Nephrology & Renal Replacement Protocols  
-> **Reference Guidelines & Standards:** `KDIGO & KDOQI Clinical Guidelines`
-
-<div align="center">
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-3776AB.svg?logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688.svg?logo=fastapi&logoColor=white)
-![Audit Trail](https://img.shields.io/badge/Audit-HMAC--SHA256_Tamper--Evident-brightgreen.svg)
-![Zero-PHI Guard](https://img.shields.io/badge/Guard-Zero--PHI_Outbound-blue.svg)
-![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg?logo=docker&logoColor=white)
-
-</div>
+> **Domain:** Nephrology, Renal Epidemiology & Clinical Laboratory Diagnostics  
+> **Clinical Guidelines & Standards:** 2021 CKD-EPI Race-Free Equations (Inker et al., NEJM 2021), 2009 CKD-EPI Equation (Levey et al., Ann Intern Med 2009), KDIGO 2012 / 2024 Clinical Practice Guideline for the Evaluation and Management of Chronic Kidney Disease
 
 ---
 
-## 📖 What It Does
+## 📖 Clinical Overview
 
-CKD-EPI eGFR Calculator
-========================
+The **CKD-EPI eGFR Calculator** computes estimated glomerular filtration rate (eGFR) and risk-stratifies chronic kidney disease (CKD) using the validated KDIGO 2012 / 2024 heat map. It implements both the updated 2021 race-free CKD-EPI equations (Creatinine, Cystatin C, and Combined Cr-CysC) and the legacy 2009 CKD-EPI equation for longitudinal trend comparison.
 
-Computes estimated glomerular filtration rate (eGFR) using:
-  - 2021 CKD-EPI creatinine equation (race-free, Inker et al., NEJM 2021)
-  - 2021 CKD-EPI cystatin C equation (race-free)
-  - 2021 CKD-EPI creatinine-cystatin C combined equation (race-free)
-  - 2009 CKD-EPI creatinine equation (with race coefficient, Levey et al.)
+### Mathematical Formulations
 
-Stages chronic kidney disease per KDIGO 2012 GFR/albuminuria grid.
+#### 1. 2021 Race-Free CKD-EPI Creatinine Equation
+$$\text{eGFR}_{\text{cr}} = 142 \times \min\left(\frac{S_{\text{cr}}}{\kappa}, 1\right)^\alpha \times \max\left(\frac{S_{\text{cr}}}{\kappa}, 1\right)^{-1.200} \times 0.9938^{\text{Age}} \times [1.012 \text{ if Female}]$$
+Where:
+- Female: $\kappa = 0.7$, $\alpha = -0.241$
+- Male: $\kappa = 0.9$, $\alpha = -0.302$
 
-Stdlib only. Usage: python egfr_calculator.py --help
+#### 2. 2021 Race-Free CKD-EPI Creatinine-Cystatin C Equation
+$$\begin{aligned}
+\text{eGFR}_{\text{cr-cys}} = & 135 \times \min\left(\frac{S_{\text{cr}}}{\kappa}, 1\right)^\alpha \times \max\left(\frac{S_{\text{cr}}}{\kappa}, 1\right)^{-0.544} \times \min\left(\frac{S_{\text{cys}}}{0.8}, 1\right)^{-0.323} \\
+& \times \max\left(\frac{S_{\text{cys}}}{0.8}, 1\right)^{-0.778} \times 0.9961^{\text{Age}} \times [0.963 \text{ if Female}]
+\end{aligned}$$
+Where:
+- Female: $\kappa = 0.7$, $\alpha = -0.219$
+- Male: $\kappa = 0.9$, $\alpha = -0.144$
 
----
-
-## ⚙️ Key Capabilities & Algorithmic Modules
-
-### 🔬 Core Algorithmic & Evaluation Engines
-
-- **`EgfrResult`** — dedicated module for egfr result evaluation and state verification.
-
----
-
-## 📐 Mathematical Formulation & Logic
-
-```text
-  """Return (stage_label, description) for a KDIGO GFR category."""
-  """Return (stage_label, description) for a KDIGO albuminuria category."""
-  result.combined_risk = kdigo_combined_risk(stage, a_stage)
-  result = calculate_patient(
-  single = subparsers.add_parser("single", help="Calculate eGFR for one patient")
-```
+### KDIGO CKD Staging Framework
+- **GFR Categories:** G1 ($\ge 90$), G2 (60–89), G3a (45–59), G3b (30–44), G4 (15–29), G5 ($< 15\,\text{mL/min/1.73m}^2$, Kidney Failure).
+- **Albuminuria Categories (ACR in mg/g):** A1 ($< 30$, Normal/Mild), A2 (30–300, Moderate), A3 ($> 300$, Severe).
 
 ---
 
 ## 💻 CLI Quickstart & Usage
 
-### 1. Guided Interactive Mode
+### 1. Calculate Single Patient eGFR & Staging
 ```bash
-python cli.py
+python cli.py single --age 60 --sex M --creatinine 1.2 --cystatin-c 1.0 --acr 400
 ```
 
-### 2. Direct Parameterized Evaluation
+### 2. Batch Process Patient CSV Dataset
 ```bash
-python cli.py --input data.csv
-```
-
-### Parameter Reference
-- `--interactive`: Launch guided terminal interactive wizard.
-- `--input <path>`: Evaluate input from JSON or CSV specification.
-- `--json`: Output deterministic structured results in JSON format.
-
-### Input Data Schema
-
-| Field | Description | Requirement |
-|:------|:------------|:------------|
-| `suite_name` | Parameter / observation metric | Required |
-| `system_slug` | Parameter / observation metric | Required |
-| `standard_reference` | Parameter / observation metric | Required |
-| `test_cases` | Parameter / observation metric | Required |
-
----
-
-## 🛡️ Security & Enterprise Architecture
-
-* **Zero-PHI Outbound Interceptor:** Active AST and regex inspection blocking SSNs, MRNs, phone numbers, and patient identifiers.
-* **Tamper-Evident HMAC-SHA256 Audit Trail:** Chained, cryptographically signed logs for every evaluation and state transition.
-* **Air-Gapped LLM Reasoning Adapter:** Agnostic integration for local Ollama instances (`llama3`, `mistral`), Claude 3.5 Sonnet, GPT-4o, and deterministic test mocks.
-* **Active Learning Bayesian Calibration:** Dynamic tracker updating worker reliability weights and monitoring Brier calibration drift.
-* **FastAPI & Prometheus Telemetry:** Exposes OpenAPI 3.1 REST endpoints and operational Prometheus metrics (`/metrics`).
-
----
-
-## 🧪 Testing & Verification
-
-Run the automated test suite:
-
-```bash
-pytest -v
-```
-
-Execute high-throughput batch simulation benchmarks:
-
-```bash
-python simulator.py --tasks 1000 --concurrency 8
+python cli.py batch -i sample.csv -o out_results.csv
 ```
 
 ---
 
-## 🐳 Container Deployment
+## 🧪 Verification & Testing
 
+Execute comprehensive unit tests via pytest:
 ```bash
-docker build -t ckd-egfr-calculator .
-docker run -p 8000:8000 ckd-egfr-calculator
+python -m pytest -p no:zarr
 ```
