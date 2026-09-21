@@ -54,7 +54,7 @@ def test_invalid_inputs_reject(func, args):
 
 def test_unit_conversion_accepts_micro_symbol():
     assert math.isclose(egfr.creatinine_to_mgdl(88.4, "µmol/L"), 1.0)
-    assert math.isclose(egfr.creatine_to_mgdl(88.4, "umol/L"), 1.0)
+    assert math.isclose(egfr.creatinine_to_mgdl(88.4, "umol/L"), 1.0)
 
 
 def test_patient_combined_preferred_and_categories():
