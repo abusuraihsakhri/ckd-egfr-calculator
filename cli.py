@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""CLI entry point for CKD-EPI eGFR Calculator."""
+"""CLI entry point for the CKD-EPI eGFR calculator."""
 import sys
 from egfr_calculator import main
 
