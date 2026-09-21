@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Adult CKD-EPI eGFR calculator with KDIGO GFR and albuminuria categories.">
+  <title>CKD-EPI eGFR Calculator</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Renal function</p>
+        <h1>CKD-EPI eGFR Calculator</h1>
+        <p class="subtitle">2021 creatinine and creatinine–cystatin C equations, with the 2012 cystatin C equation and KDIGO G/A categories.</p>
+      </div>
+      <button id="theme-toggle" class="icon-button" type="button" aria-label="Toggle color theme">◐</button>
+    </header>
+
+    <section class="workspace" aria-label="eGFR calculator">
+      <form id="calculator-form" class="panel input-panel">
+        <div class="section-heading">
+          <h2>Inputs</h2>
+          <span class="badge">Adults ≥18</span>
+        </div>
+        <div class="form-grid">
+          <label>Age <span>years</span><input id="age" type="number" min="18" step="1" inputmode="numeric" required placeholder="60"></label>
+          <label>Sex <span>equation variable</span><select id="sex" required><option value="">Select</option><option value="F">Female</option><option value="M">Male</option></select></label>
+          <label>Creatinine <span>optional</span><input id="creatinine" type="number" min="0" step="any" inputmode="decimal" placeholder="1.2"></label>
+          <label>Creatinine unit <span>&nbsp;</span><select id="creatinine-unit"><option value="mg/dL">mg/dL</option><option value="µmol/L">µmol/L</option></select></label>
+          <label>Cystatin C <span>mg/L · optional</span><input id="cystatin" type="number" min="0" step="any" inputmode="decimal" placeholder="1.0"></label>
+          <label>Urine ACR <span>mg/g · optional</span><input id="acr" type="number" min="0" step="any" inputmode="decimal" placeholder="30"></label>
+        </div>
+        <p id="error-message" class="error" role="alert" hidden></p>
+        <div class="actions">
+          <button class="primary" type="submit">Analyze</button>
+          <button id="reset-button" class="secondary" type="button">Reset</button>
+        </div>
+      </form>
+
+      <section id="results" class="panel results-panel" aria-live="polite" hidden>
+        <div class="section-heading"><h2>Result</h2><span class="badge subtle">mL/min/1.73 m²</span></div>
+        <div class="hero-result">
+          <div><span>Primary eGFR</span><strong id="primary-egfr">—</strong></div>
+          <div><span>GFR category</span><strong id="gfr-category">—</strong><small id="gfr-description"></small></div>
+          <div><span>Albuminuria</span><strong id="albuminuria-category">—</strong><small id="albuminuria-description"></small></div>
+          <div><span>KDIGO risk</span><strong id="kdigo-risk">—</strong></div>
+        </div>
+        <div class="estimates">
+          <div><span>2021 eGFRcr</span><b id="creatinine-egfr">—</b></div>
+          <div><span>2012 eGFRcys</span><b id="cystatin-egfr">—</b></div>
+          <div><span>2021 eGFRcr-cys</span><b id="combined-egfr">—</b></div>
+        </div>
+      </section>
+    </section>
+
+    <footer>
+      <p><strong>Clinical note:</strong> A single eGFR or ACR result does not establish chronic kidney disease. Interpret results with chronicity, clinical context, standardized assays, and current guidance.</p>
+      <p class="privacy">Calculations run locally in your browser. Patient values are not uploaded or stored; only the light/dark theme preference may be saved.</p>
+    </footer>
+  </main>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

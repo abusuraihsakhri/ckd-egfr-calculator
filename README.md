@@ -1,54 +1,64 @@
-# CKD-EPI eGFR Calculator & KDIGO Staging Engine
+# CKD-EPI eGFR Calculator
 
-> **Domain:** Nephrology, Renal Epidemiology & Clinical Laboratory Diagnostics  
-> **Clinical Guidelines & Standards:** 2021 CKD-EPI Race-Free Equations (Inker et al., NEJM 2021), 2009 CKD-EPI Equation (Levey et al., Ann Intern Med 2009), KDIGO 2012 / 2024 Clinical Practice Guideline for the Evaluation and Management of Chronic Kidney Disease
+A compact adult eGFR calculator implementing the 2021 CKD-EPI creatinine and creatinine–cystatin C equations, the 2012 CKD-EPI cystatin C equation, and KDIGO GFR/albuminuria categories. The repository also provides a dependency-free Python CLI and CSV batch workflow.
 
----
+## Features
 
-## 📖 Clinical Overview
+- 2021 race-free CKD-EPI creatinine equation (`eGFRcr`)
+- 2012 CKD-EPI cystatin C equation (`eGFRcys`)
+- 2021 race-free CKD-EPI creatinine–cystatin C equation (`eGFRcr-cys`)
+- Legacy 2009 CKD-EPI creatinine calculation in the Python CLI for longitudinal comparison only
+- KDIGO G1–G5 and A1–A3 categorization with the G/A risk grid
+- Creatinine input in mg/dL or µmol/L
+- Browser interface with light/dark themes and no server-side processing
+- CSV batch processing from the command line
 
-The **CKD-EPI eGFR Calculator** computes estimated glomerular filtration rate (eGFR) and risk-stratifies chronic kidney disease (CKD) using the validated KDIGO 2012 / 2024 heat map. It implements both the updated 2021 race-free CKD-EPI equations (Creatinine, Cystatin C, and Combined Cr-CysC) and the legacy 2009 CKD-EPI equation for longitudinal trend comparison.
+## Use
 
-### Mathematical Formulations
+Open the live application, enter age and sex, then provide creatinine, cystatin C, or both. ACR is optional and enables albuminuria categorization and the combined KDIGO risk category. Press **Analyze** to calculate.
 
-#### 1. 2021 Race-Free CKD-EPI Creatinine Equation
-$$\text{eGFR}_{\text{cr}} = 142 \times \min\left(\frac{S_{\text{cr}}}{\kappa}, 1\right)^\alpha \times \max\left(\frac{S_{\text{cr}}}{\kappa}, 1\right)^{-1.200} \times 0.9938^{\text{Age}} \times [1.012 \text{ if Female}]$$
-Where:
-- Female: $\kappa = 0.7$, $\alpha = -0.241$
-- Male: $\kappa = 0.9$, $\alpha = -0.302$
+For the CLI:
 
-#### 2. 2021 Race-Free CKD-EPI Creatinine-Cystatin C Equation
-$$\begin{aligned}
-\text{eGFR}_{\text{cr-cys}} = & 135 \times \min\left(\frac{S_{\text{cr}}}{\kappa}, 1\right)^\alpha \times \max\left(\frac{S_{\text{cr}}}{\kappa}, 1\right)^{-0.544} \times \min\left(\frac{S_{\text{cys}}}{0.8}, 1\right)^{-0.323} \\
-& \times \max\left(\frac{S_{\text{cys}}}{0.8}, 1\right)^{-0.778} \times 0.9961^{\text{Age}} \times [0.963 \text{ if Female}]
-\end{aligned}$$
-Where:
-- Female: $\kappa = 0.7$, $\alpha = -0.219$
-- Male: $\kappa = 0.9$, $\alpha = -0.144$
-
-### KDIGO CKD Staging Framework
-- **GFR Categories:** G1 ($\ge 90$), G2 (60–89), G3a (45–59), G3b (30–44), G4 (15–29), G5 ($< 15\,\text{mL/min/1.73m}^2$, Kidney Failure).
-- **Albuminuria Categories (ACR in mg/g):** A1 ($< 30$, Normal/Mild), A2 (30–300, Moderate), A3 ($> 300$, Severe).
-
----
-
-## 💻 CLI Quickstart & Usage
-
-### 1. Calculate Single Patient eGFR & Staging
 ```bash
 python cli.py single --age 60 --sex M --creatinine 1.2 --cystatin-c 1.0 --acr 400
+python cli.py batch -i sample.csv -o results.csv
 ```
 
-### 2. Batch Process Patient CSV Dataset
+The input CSV uses these columns:
+
+```text
+patient_id,age,sex,creatinine,creatinine_unit,cystatin_c,acr,race
+```
+
+`race` is used only for the retained 2009 legacy comparison. Current primary estimates use race-free equations.
+
+## Clinical interpretation
+
+This tool reports estimated GFR and KDIGO GFR/albuminuria categories. A single measurement does **not** diagnose chronic kidney disease. CKD requires evidence of chronicity and/or other markers of kidney damage, and results should be interpreted with the clinical context and appropriately standardized assays.
+
+The formulas implemented here correspond to the National Kidney Foundation/NIDDK descriptions of the 2021 CKD-EPI creatinine and creatinine–cystatin C equations and the 2012 CKD-EPI cystatin C equation. KDIGO 2024 retains the G1–G5 and A1–A3 classification framework.
+
+## Privacy
+
+The web calculator runs entirely in the browser. Patient values are not sent to a server or persisted by the application. Only the selected light/dark theme may be stored locally. The Python CLI processes files locally.
+
+## Development and testing
+
+Runtime code uses only the Python standard library and browser-native JavaScript. `pytest` is needed only for Python tests.
+
 ```bash
-python cli.py batch -i sample.csv -o out_results.csv
+python -m pip install pytest
+python -m pytest -q
+node --test tests/web_calculator.test.mjs
+python -m compileall -q egfr_calculator.py cli.py
 ```
 
----
+GitHub Actions runs Python tests on Python 3.10–3.13, browser-core tests on Node 22, a CLI smoke test, and GitHub Pages deployment.
 
-## 🧪 Verification & Testing
+## Browser compatibility
 
-Execute comprehensive unit tests via pytest:
-```bash
-python -m pytest -p no:zarr
-```
+The web app uses standard ES modules and modern CSS. Current versions of Chrome, Edge, Firefox, and Safari are supported. JavaScript must be enabled.
+
+## License
+
+MIT License. See [LICENSE](LICENSE).

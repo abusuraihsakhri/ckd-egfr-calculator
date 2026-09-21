@@ -1,0 +1,8 @@
+{
+  "name": "ckd-egfr-calculator",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:web": "node --test tests/web_calculator.test.mjs"
+  }
+}
